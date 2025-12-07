@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Temperature - Chomp Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tools-recipes-style.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="site-nav">
+            <a href="../index.html" class="site-logo">
+                <div class="site-logo-icon">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/chomp-chomp-recipes.firebasestorage.app/o/posts%2Fimages%2F1764704134358_IMG_3432.png?alt=media&token=24b33f57-609c-452c-b7cb-9e5cdf85859c" alt="Chomp Chomp" class="logo-default">
+                    <img src="https://firebasestorage.googleapis.com/v0/b/chomp-chomp-recipes.firebasestorage.app/o/posts%2Fimages%2F1764704133716_IMG_3433.jpeg?alt=media&token=94d04258-f7c1-4eed-983a-a0eaad6c4f0b" alt="Chomp Chomp" class="logo-hover">
+                </div>
+            </a>
+            <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+            <div class="nav-tools-dropdown">
+                <button class="tools-dropdown-btn" onclick="toggleToolsDropdown()">Menu ▼</button>
+                <ul class="tools-dropdown-menu" id="toolsDropdown">
+                    <li><a href="../index.html">Home</a></li>
+                    <li><a href="../stories.html">Stories</a></li>
+                    <li><a href="../recipes.html">Recipes</a></li>
+                    <li><a href="../about.html">About</a></li>
+                    <li class="menu-item-has-submenu">
+                        <a href="#">Ipsum</a>
+                        <ul class="submenu">
+                            <li><a href="inferno.html">Inferno</a></li>
+                            <li><a href="nautical.html">Nautical</a></li>
+                        </ul>
+                    </li>
+                    <li class="menu-item-has-submenu">
+                        <a href="#">Tools</a>
+                        <ul class="submenu">
+                            <li><a href="ip.html">Whois</a></li>
+                            <li><a href="convert.html">Convert</a></li>
+                            <li><a href="encode.html">Encode</a></li>
+                            <li><a href="subnet.html">Subnet</a></li>
+                            <li><a href="temperature.html">Temperature</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="page-container">
+        <div class="tool-page">
+            <div class="tool-header">
+                <h1>Temperature & Weather Comfort</h1>
+                <p class="tool-subtitle">Convert temperatures and calculate heat index, apparent temperature & comfort levels</p>
+            </div>
+
+            <!-- Quick Temperature Converter -->
+            <div class="tool-section">
+                <h2 class="section-title">Quick Temperature Converter</h2>
+                <div class="tool-controls">
+                    <div class="control-group">
+                        <label class="control-label">Fahrenheit</label>
+                        <input type="number" id="fahrenheit" class="form-input" placeholder="Enter °F" oninput="convertFromF()">
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label">Celsius</label>
+                        <input type="number" id="celsius" class="form-input" placeholder="Enter °C" oninput="convertFromC()">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Comprehensive Comfort Calculator -->
+            <div class="tool-section">
+                <h2 class="section-title">Weather Comfort Calculator</h2>
+                <div class="tool-controls">
+                    <div class="control-group">
+                        <label class="control-label">Temperature</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="temp" class="form-input" placeholder="Enter temperature" style="flex: 2;">
+                            <select id="unit" class="form-select" style="flex: 1;">
+                                <option value="F">°F</option>
+                                <option value="C">°C</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Relative Humidity (%)</label>
+                        <input type="number" id="humidity" class="form-input" placeholder="Optional if dew point is given">
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Dew Point (°F or °C to match temp)</label>
+                        <input type="number" id="dewpoint" class="form-input" placeholder="Optional">
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Wind Speed (m/s)</label>
+                        <input type="number" id="wind" class="form-input" placeholder="Optional, default 0" value="0">
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label">Sun Exposure (% full sun, 0–100)</label>
+                        <input type="number" id="sun" class="form-input" placeholder="Optional, 0–100" value="0">
+                    </div>
+
+                    <div class="tool-actions">
+                        <button class="tool-button" onclick="calculateComfort()">Calculate Comfort</button>
+                        <button class="tool-button tool-button-secondary" onclick="resetCalculator()">Reset</button>
+                    </div>
+                </div>
+
+                <div class="tool-result" id="results" style="display: none;">
+                    <h3 style="margin-bottom: 15px;">Results</h3>
+                    <div class="result-item">
+                        <span class="result-label">Estimated RH (if dew point used):</span>
+                        <span class="result-value" id="calcRH">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Heat Index:</span>
+                        <span class="result-value" id="fullHI">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Simplified Apparent Temperature:</span>
+                        <span class="result-value" id="simpleHI">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Enhanced Apparent Temperature (w/ sun & wind):</span>
+                        <span class="result-value" id="enhancedHI">--</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Dew Point Comfort Index:</span>
+                        <span class="result-value" id="dewComfort">--</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>Baking is the materialization of comfort itself.</p>
+            <div class="footer-links">
+                <a href="mailto:hi@chomp.be">hi@chomp.be</a>
+                <a href="https://www.chomp.ltd" target="_blank">chomp chomp: cookies, etc.</a>
+                <a href="https://chomp.be/tools" target="_blank">chomp chomp: tools</a>
+            </div>
+            <p style="margin-top: 20px; font-size: 0.85em;">&copy; 2025 Chomp Chomp</p>
+        </div>
+    </footer>
+
+    <script>
+        // Quick Temperature Converter
+        function convertFromF() {
+            const f = parseFloat(document.getElementById('fahrenheit').value);
+            if (!isNaN(f)) {
+                const c = (f - 32) * 5 / 9;
+                document.getElementById('celsius').value = c.toFixed(2);
+            } else {
+                document.getElementById('celsius').value = '';
+            }
+        }
+
+        function convertFromC() {
+            const c = parseFloat(document.getElementById('celsius').value);
+            if (!isNaN(c)) {
+                const f = c * 9 / 5 + 32;
+                document.getElementById('fahrenheit').value = f.toFixed(2);
+            } else {
+                document.getElementById('fahrenheit').value = '';
+            }
+        }
+
+        // Helper functions
+        function toFahrenheit(temp, unit) {
+            return unit === 'C' ? (temp * 9 / 5 + 32) : temp;
+        }
+
+        function toCelsius(temp, unit) {
+            return unit === 'F' ? (temp - 32) * 5 / 9 : temp;
+        }
+
+        function dewComfort(dewF) {
+            if (dewF < 50) return "Dry and comfortable";
+            if (dewF < 60) return "Pleasant";
+            if (dewF < 65) return "A bit humid";
+            if (dewF < 70) return "Humid and muggy";
+            if (dewF < 75) return "Sticky and oppressive";
+            return "Extremely humid and uncomfortable";
+        }
+
+        function fullHeatIndex(T, R) {
+            if (T < 80 || R < 40) return T.toFixed(2);
+            let HI = -42.379 + 2.04901523 * T + 10.14333127 * R
+                     - 0.22475541 * T * R - 6.83783e-3 * T * T
+                     - 5.481717e-2 * R * R + 1.22874e-3 * T * T * R
+                     + 8.5282e-4 * T * R * R - 1.99e-6 * T * T * R * R;
+            return HI.toFixed(2);
+        }
+
+        function simplifiedApparentTemp(T, R, wind) {
+            let HI = T + 0.33 * R - 0.70 * wind - 4.00;
+            return HI.toFixed(2);
+        }
+
+        function enhancedApparentTemp(T, R, wind, sun) {
+            let sunEffect = T * (sun / 100) * 0.07;
+            let adjustedT = T + sunEffect;
+            return simplifiedApparentTemp(adjustedT, R, wind);
+        }
+
+        function estimateRH(tempC, dewC) {
+            let e_t = 6.112 * Math.exp((17.67 * tempC) / (tempC + 243.5));
+            let e_td = 6.112 * Math.exp((17.67 * dewC) / (dewC + 243.5));
+            let rh = 100 * (e_td / e_t);
+            return Math.round(rh * 100) / 100;
+        }
+
+        function calculateComfort() {
+            let T = parseFloat(document.getElementById("temp").value);
+            let unit = document.getElementById("unit").value;
+            let R = parseFloat(document.getElementById("humidity").value);
+            let dew = document.getElementById("dewpoint").value;
+            let wind = parseFloat(document.getElementById("wind").value || "0");
+            let sun = parseFloat(document.getElementById("sun").value || "0");
+
+            if (isNaN(T)) {
+                alert("Please enter a valid temperature.");
+                return;
+            }
+
+            let Tf = toFahrenheit(T, unit);
+            let dewF = dew ? toFahrenheit(parseFloat(dew), unit) : null;
+            let tempC = toCelsius(T, unit);
+            let dewC = dew ? toCelsius(parseFloat(dew), unit) : null;
+
+            let computedRH = (!isNaN(R)) ? R : (dew ? estimateRH(tempC, dewC) : null);
+            let RHdisplay = computedRH ? computedRH.toFixed(2) + "%" : "(RH not available)";
+            document.getElementById("calcRH").innerText = RHdisplay;
+
+            let displayRH = computedRH || 0;
+
+            document.getElementById("fullHI").innerText = fullHeatIndex(Tf, displayRH) + " °F";
+            document.getElementById("simpleHI").innerText = simplifiedApparentTemp(Tf, displayRH, wind) + " °F";
+            document.getElementById("enhancedHI").innerText = enhancedApparentTemp(Tf, displayRH, wind, sun) + " °F";
+            document.getElementById("dewComfort").innerText = dewF ? dewComfort(dewF) : "(No dew point given)";
+
+            document.getElementById("results").style.display = "block";
+        }
+
+        function resetCalculator() {
+            document.getElementById("temp").value = "";
+            document.getElementById("humidity").value = "";
+            document.getElementById("dewpoint").value = "";
+            document.getElementById("wind").value = "0";
+            document.getElementById("sun").value = "0";
+            document.getElementById("results").style.display = "none";
+        }
+
+        function toggleToolsDropdown() {
+            const dropdown = document.getElementById('toolsDropdown');
+            dropdown.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
