@@ -178,6 +178,18 @@
       loadRecipe(slug);
     }
 
+    // Helper: Assign dish type based on title
+    function assignDishType(title) {
+      const lower = title.toLowerCase();
+      if (lower.includes('cake') || lower.includes('torte') || lower.includes('pie') || lower.includes('brûlée')) return 'Dessert/Pastry';
+      if (lower.includes('cookie') || lower.includes('cookies')) return 'Cookie/Bar';
+      if (lower.includes('custard')) return 'Frozen Dessert';
+      if (lower.includes('pudding')) return 'Pudding/Cream';
+      if (lower.includes('taco') || lower.includes('main dish')) return 'Main Dish';
+      if (lower.includes('soup')) return 'Soup';
+      return 'Other Baked Goods';
+    }
+
     // Load recipe from Firestore
     async function loadRecipe(slug) {
       try {
@@ -191,6 +203,10 @@
         }
 
         const recipe = snapshot.docs[0].data();
+        // Ensure dishType is set
+        if (!recipe.dishType) {
+          recipe.dishType = assignDishType(recipe.title);
+        }
         displayRecipe(recipe);
       } catch (error) {
         console.error("Error loading recipe:", error);
@@ -204,16 +220,16 @@
 
       const container = document.getElementById('recipeContainer');
 
-      // Build metadata string (including source, dish type, and category)
+      // Build metadata string (Type first, then times/servings, then category, then source)
       const metaParts = [];
       const dishType = recipe.dishType;
       const category = recipe.category;
       if (dishType) metaParts.push(`Type: ${dishType}`);
-      if (category) metaParts.push(`Category: ${category}`);
       if (recipe.prepTime) metaParts.push(`Prep: ${recipe.prepTime}`);
       if (recipe.cookTime) metaParts.push(`Cook: ${recipe.cookTime}`);
       if (recipe.totalTime) metaParts.push(`Total: ${recipe.totalTime}`);
       if (recipe.servings) metaParts.push(`Servings: ${recipe.servings}`);
+      if (category) metaParts.push(`Category: ${category}`);
       if (recipe.source) metaParts.push(`Source: ${formatSource(recipe.source)}`);
       const metaString = metaParts.join(' | ');
 
