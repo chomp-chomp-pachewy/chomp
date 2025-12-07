@@ -226,6 +226,59 @@
       background-color: #d0323a;
     }
 
+    /* Dark mode styles */
+    @media (prefers-color-scheme: dark) {
+      .action-btn {
+        background-color: #2b2626;
+        color: #d9d4d4;
+        border-color: #3b3636;
+      }
+
+      .action-btn:hover {
+        background-color: #ff6b7a;
+        color: #231f1f;
+        border-color: #ff6b7a;
+      }
+
+      .action-btn-primary {
+        background-color: #ff6b7a;
+        color: #231f1f;
+        border-color: #ff6b7a;
+      }
+
+      .action-btn-primary:hover {
+        background-color: #ff8590;
+        border-color: #ff8590;
+      }
+
+      .share-dropdown-menu {
+        background-color: #2b2626;
+        border-color: #3b3636;
+      }
+
+      .share-dropdown-menu button {
+        color: #d9d4d4;
+      }
+
+      .share-dropdown-menu button:hover {
+        background-color: #3b3636;
+      }
+
+      .cook-mode-exit {
+        background-color: #ff6b7a;
+        color: #231f1f;
+      }
+
+      .cook-mode-exit:hover {
+        background-color: #ff8590;
+      }
+
+      .toast {
+        background-color: #2b2626;
+        color: #d9d4d4;
+      }
+    }
+
     /* Mobile responsive */
     @media (max-width: 768px) {
       .recipe-actions {
