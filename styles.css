@@ -288,6 +288,13 @@ img {
   opacity: 0.7;
 }
 
+/* Dark mode - red hamburger icon */
+@media (prefers-color-scheme: dark) {
+  .menu-toggle {
+    color: var(--color-accent);
+  }
+}
+
 /* ---------------------------------------------------- */
 /* === LAYOUT CONTAINERS === */
 /* ---------------------------------------------------- */
