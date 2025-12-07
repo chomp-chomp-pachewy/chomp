@@ -180,6 +180,7 @@
 
     body.cook-mode {
       background-color: #fafafa;
+      color: #1a1a1a;
     }
 
     body.cook-mode .page-container {
@@ -191,6 +192,7 @@
     body.cook-mode .recipe-section h2 {
       font-size: 2em;
       margin-bottom: 25px;
+      color: #1a1a1a;
     }
 
     body.cook-mode .ingredients-list li,
@@ -198,6 +200,13 @@
       font-size: 1.2em;
       line-height: 1.8;
       margin-bottom: 15px;
+      color: #1a1a1a;
+    }
+
+    body.cook-mode h1,
+    body.cook-mode p,
+    body.cook-mode .post-meta {
+      color: #1a1a1a;
     }
 
     .cook-mode-exit {
@@ -369,6 +378,7 @@
                 <li><a href="tools/convert.html">Convert</a></li>
                 <li><a href="tools/encode.html">Encode</a></li>
                 <li><a href="tools/subnet.html">Subnet</a></li>
+                <li><a href="tools/temperature.html">Temperature</a></li>
               </ul>
             </li>
           </ul>
@@ -853,7 +863,8 @@
           .recipe-actions,
           .site-header,
           .site-footer,
-          .cook-mode-exit {
+          .cook-mode-exit,
+          .toast {
             display: none !important;
           }
           body {
@@ -863,9 +874,9 @@
       `;
       document.head.appendChild(style);
 
-      showToast('📄 Opening print dialog...');
       toggleShareDropdown();
 
+      // Wait a moment before opening print dialog
       setTimeout(() => {
         window.print();
         // Remove print style after printing
@@ -873,7 +884,7 @@
           const printStyle = document.getElementById('printStyle');
           if (printStyle) printStyle.remove();
         }, 1000);
-      }, 500);
+      }, 100);
     }
 
     // Toggle cook mode
