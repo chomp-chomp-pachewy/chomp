@@ -227,11 +227,11 @@
             : '<div style="height: 280px; background-color: var(--color-sidebar-bg); display: flex; align-items: center; justify-content: center; color: var(--color-text-muted);">Image Coming Soon</div>'
           }
           <div class="featured-card-content">
-            <div class="featured-card-tag">Featured · ${recipe.dishType || 'Recipe'}</div>
+            <div class="featured-card-tag">Featured Recipe</div>
             <h3>${recipe.title}</h3>
             <p>${recipe.description || ''}</p>
             <div class="featured-card-meta">
-              <span>${recipe.category || 'Recipe'}</span>
+              <span>${recipe.dishType || 'Recipe'}</span>
               ${recipe.totalTime ? `<span>${recipe.totalTime}</span>` : ''}
             </div>
           </div>
@@ -273,12 +273,31 @@
       }
     }
 
+    // Helper: Assign dish type based on title
+    function assignDishType(title) {
+      const lower = title.toLowerCase();
+      if (lower.includes('cake') || lower.includes('torte') || lower.includes('pie') || lower.includes('brûlée')) return 'Dessert/Pastry';
+      if (lower.includes('cookie') || lower.includes('cookies')) return 'Cookie/Bar';
+      if (lower.includes('custard')) return 'Frozen Dessert';
+      if (lower.includes('pudding')) return 'Pudding/Cream';
+      if (lower.includes('taco') || lower.includes('main dish')) return 'Main Dish';
+      if (lower.includes('soup')) return 'Soup';
+      return 'Other Baked Goods';
+    }
+
     // Load featured recipe (random)
     async function loadFeaturedRecipe() {
       try {
         const recipesRef = collection(db, `artifacts/${appId}/public/data/recipes`);
         const snapshot = await getDocs(recipesRef);
-        const recipes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        const recipes = snapshot.docs.map(doc => {
+          const data = { id: doc.id, ...doc.data() };
+          // Ensure dishType is set
+          if (!data.dishType) {
+            data.dishType = assignDishType(data.title);
+          }
+          return data;
+        });
 
         if (recipes.length > 0) {
           const randomIndex = Math.floor(Math.random() * recipes.length);
