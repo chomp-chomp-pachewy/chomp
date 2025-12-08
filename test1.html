@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Debug Test</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .box { border: 2px solid red; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+
+    <h1>Debug Test Page</h1>
+    <p>If you can read this, HTML is working.</p>
+
+    <div class="box">
+        <h3>Firebase Connection Test</h3>
+        <div id="status">Connecting...</div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Your Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCPb87ZtJbpI7YRRwKVNL-g3O-VrONwtM",
+            authDomain: "chomp-chomp-recipes.firebaseapp.com",
+            projectId: "chomp-chomp-recipes",
+            storageBucket: "chomp-chomp-recipes.firebasestorage.app",
+            messagingSenderId: "225432495618",
+            appId: "1:225432495618:web:459eb1c0b7228dfc24e91b"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 1. Try the Complex Path
+        console.log("Attempting complex path...");
+        try {
+            const complexRef = collection(db, `artifacts/${firebaseConfig.projectId}/public/data/recipes`);
+            const complexSnap = await getDocs(complexRef);
+            console.log("Complex Path Recipes found:", complexSnap.size);
+            
+            if (complexSnap.size > 0) {
+                document.getElementById('status').innerHTML += `<br>✅ Found ${complexSnap.size} recipes in 'artifacts/.../recipes'`;
+            } else {
+                document.getElementById('status').innerHTML += `<br>❌ No recipes in 'artifacts/.../recipes'`;
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('status').innerHTML += `<br>⚠️ Error reading complex path: ${e.message}`;
+        }
+
+        // 2. Try the Simple Path
+        console.log("Attempting simple path...");
+        try {
+            const simpleRef = collection(db, "recipes");
+            const simpleSnap = await getDocs(simpleRef);
+            console.log("Simple Path Recipes found:", simpleSnap.size);
+
+            if (simpleSnap.size > 0) {
+                document.getElementById('status').innerHTML += `<br>✅ Found ${simpleSnap.size} recipes in 'recipes' (Root)`;
+            } else {
+                document.getElementById('status').innerHTML += `<br>❌ No recipes in 'recipes' (Root)`;
+            }
+        } catch (e) {
+            console.error(e);
+            document.getElementById('status').innerHTML += `<br>⚠️ Error reading simple path: ${e.message}`;
+        }
+    </script>
+</body>
+</html>
