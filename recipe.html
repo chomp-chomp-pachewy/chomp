@@ -356,7 +356,8 @@
         </a>
       </div>
 
-      <div class="header-right"><div class="nav-tools-dropdown">
+      <div class="header-right">
+        <div class="nav-tools-dropdown">
           <button class="menu-toggle" onclick="toggleToolsDropdown()">☰</button>
           <button class="tools-dropdown-btn" onclick="toggleToolsDropdown()">Menu ▼</button>
           <ul class="tools-dropdown-menu" id="toolsDropdown">
@@ -696,6 +697,27 @@
       return tmp.textContent || tmp.innerText || '';
     }
 
+    // Normalize rich-text-ish fields (strings or arrays) into a clean, one-line string
+    function normalizeRichTextField(value) {
+      if (!value) return '';
+
+      // If it's an array (e.g., multiple paragraphs), join with blank lines
+      const asString = Array.isArray(value)
+        ? value.map(v => String(v)).join('\n\n')
+        : String(value);
+
+      // Use markdown → HTML → plain text pipeline
+      let text = stripHTML(parseMarkdown(asString));
+
+      // Collapse newlines/spaces so description becomes a single, tidy line
+      text = text
+        .replace(/\s*\n+\s*/g, ' ')   // newlines → single space
+        .replace(/\s{2,}/g, ' ')      // multiple spaces → one
+        .trim();
+
+      return text;
+    }
+
     // Add Schema.org Recipe structured data
     function addRecipeSchema(recipe) {
       // Remove existing schema if present
@@ -704,75 +726,74 @@
         existingSchema.remove();
       }
 
-      // Get clean ingredient list (strip headers and HTML)
+      // Ingredients: strip headers and HTML, as before
       const ingredients = Array.isArray(recipe.ingredients)
         ? recipe.ingredients
-            .map(i => parseMarkdown(i))
+            .map(i => parseMarkdown(String(i)))
             .filter(i => !i.startsWith('<h1') && !i.startsWith('<h2') && !i.startsWith('<h3'))
-            .map(i => stripHTML(i))
+            .map(i => stripHTML(i).trim())
+            .filter(i => i.length > 0)
         : [];
 
-      // Get clean instruction list
+      // Instructions: HowToStep array with clean text, skipping header-only items
       const instructions = Array.isArray(recipe.instructions)
         ? recipe.instructions
-            .map(i => parseMarkdown(i))
+            .map(i => parseMarkdown(String(i)))
             .filter(i => !i.startsWith('<h1') && !i.startsWith('<h2') && !i.startsWith('<h3'))
-            .map((i, index) => ({
-              "@type": "HowToStep",
-              "position": index + 1,
-              "text": stripHTML(i)
-            }))
+            .map((i, index) => {
+              const text = stripHTML(i).trim();
+              return text
+                ? {
+                    "@type": "HowToStep",
+                    "position": index + 1,
+                    "text": text
+                  }
+                : null;
+            })
+            .filter(Boolean)
         : [];
 
-      // Build comprehensive description including notes
-      let fullDescription = '';
-      if (recipe.description) {
-        fullDescription = stripHTML(parseMarkdown(recipe.description));
+      // Description + notes merged and flattened
+      const descriptionText = normalizeRichTextField(recipe.description);
+      const notesText = normalizeRichTextField(recipe.notes);
+
+      let fullDescription = descriptionText;
+      if (notesText) {
+        fullDescription = fullDescription
+          ? `${fullDescription} Notes: ${notesText}`
+          : notesText;
       }
-      if (recipe.notes) {
-        const notesText = stripHTML(parseMarkdown(recipe.notes));
-        if (fullDescription) {
-          fullDescription += '\n\n' + notesText;
-        } else {
-          fullDescription = notesText;
-        }
-      }
-      // Fallback to title if no description or notes
       if (!fullDescription) {
-        fullDescription = recipe.title;
+        fullDescription = recipe.title || '';
       }
 
-      // Build schema object
+      const pageUrl = window.location.href;
+
+      // Base schema object
       const schema = {
-        "@context": "https://schema.org/",
+        "@context": "https://schema.org",
         "@type": "Recipe",
         "name": recipe.title,
+        "description": fullDescription,
+        "recipeIngredient": ingredients,
         "author": {
           "@type": "Organization",
           "name": "Chomp Chomp Recipes"
         },
         "datePublished": recipe.date || new Date().toISOString().split('T')[0],
-        "description": fullDescription,
-        "recipeIngredient": ingredients
+        "url": pageUrl,
+        "mainEntityOfPage": pageUrl
       };
 
-      // Add additional description field for better compatibility
-      if (recipe.description) {
-        schema["about"] = stripHTML(parseMarkdown(recipe.description));
-      }
-
-      // Add notes as separate field for scrapers that support it
-      if (recipe.notes) {
-        schema["recipeNotes"] = stripHTML(parseMarkdown(recipe.notes));
-      }
-
-      // Add image
+      // Image
       if (recipe.image) {
         const imagePath = getImagePath(recipe.image);
-        schema.image = imagePath.startsWith('http') ? imagePath : `https://chomp.be/${imagePath}`;
+        schema.image = imagePath.startsWith('http')
+          ? imagePath
+          : `https://chomp.be/${imagePath}`;
       }
 
-      // Add times in ISO 8601 format
+      // Times (ISO 8601)
       if (recipe.prepTime) {
         const prepISO = convertToISO8601Duration(recipe.prepTime);
         if (prepISO) schema.prepTime = prepISO;
@@ -786,32 +807,55 @@
         if (totalISO) schema.totalTime = totalISO;
       }
 
-      // Add servings/yield
+      // Servings / yield
       if (recipe.servings) {
         schema.recipeYield = recipe.servings;
       }
 
-      // Add category
+      // Category / cuisine
       if (recipe.category) {
         schema.recipeCategory = recipe.category;
       }
-
-      // Add dish type as cuisine
       if (recipe.dishType) {
         schema.recipeCuisine = recipe.dishType;
       }
 
-      // Add instructions
+      // Instructions
       if (instructions.length > 0) {
         schema.recipeInstructions = instructions;
       }
 
-      // Add keywords
+      // Keywords: include category, dishType, tags
       const keywords = [];
       if (recipe.category) keywords.push(recipe.category);
       if (recipe.dishType) keywords.push(recipe.dishType);
+      if (Array.isArray(recipe.tags)) {
+        keywords.push(...recipe.tags.map(String));
+      }
       if (keywords.length > 0) {
         schema.keywords = keywords.join(', ');
+      }
+
+      // “Pure” description as about
+      if (descriptionText) {
+        schema.about = descriptionText;
+      }
+
+      // Notes as Comment array
+      if (notesText) {
+        schema.comment = [{
+          "@type": "Comment",
+          "text": notesText
+        }];
+      }
+
+      // Source, if present
+      if (recipe.source) {
+        if (typeof recipe.source === 'string') {
+          schema.isBasedOn = recipe.source;
+        } else if (recipe.source.url) {
+          schema.isBasedOn = recipe.source.url;
+        }
       }
 
       // Create and inject script tag
