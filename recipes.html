@@ -192,7 +192,6 @@
 
         <select id="sortBy">
           <option value="alphabetical">Sort: A-Z</option>
-          <option value="newest">Sort: Newest</option>
           <option value="time">Sort: Quickest Time</option>
         </select>
 
@@ -422,8 +421,6 @@
       // Sort recipes
       if (sortBy === 'time') {
         filtered.sort((a, b) => (a.totalTimeInMinutes || Infinity) - (b.totalTimeInMinutes || Infinity));
-      } else if (sortBy === 'newest') {
-        filtered = filtered.slice().reverse(); // assuming newest last in snapshot order
       } else {
         filtered.sort((a, b) =>
           String(a.title || '').toLowerCase().localeCompare(String(b.title || '').toLowerCase())
