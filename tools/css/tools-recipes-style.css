@@ -761,6 +761,11 @@ textarea.control-input {
     border-color: #463f3f;
   }
 
+  /* Menu dropdown button color in dark mode */
+  .tools-dropdown-btn {
+    color: #353535;
+  }
+
   /* Index page link colors in dark mode */
   .tool-link:hover,
   .tool-name u {
