@@ -8,37 +8,26 @@
 
 ## What You Need to Do (One-Time Setup)
 
-### Step 1: Get Firebase CI Token
+### Step 1: Get Firebase Service Account Key
 
-You have two options:
+**Note:** The `firebase login:ci` method is deprecated. Use service accounts instead.
 
-#### Option A: Using Firebase Token (Simpler)
-1. Install Firebase CLI locally on your computer (one-time):
-   ```bash
-   npm install -g firebase-tools
-   ```
-2. Login and get token:
-   ```bash
-   firebase login:ci
-   ```
-3. Copy the token it gives you
-
-#### Option B: Using Service Account (More Secure)
 1. Go to [Firebase Console](https://console.firebase.google.com)
 2. Select project: **chomp-chomp-recipes**
 3. Click gear icon → **Project Settings**
 4. Go to **Service Accounts** tab
 5. Click **Generate New Private Key**
-6. Download the JSON file
-7. Copy the entire contents
+6. Click **Generate Key** to confirm
+7. Download the JSON file
+8. Open the file and copy the entire contents
 
-### Step 2: Add Token to GitHub
+### Step 2: Add Service Account to GitHub
 
 1. Go to your GitHub repository
 2. Navigate to: **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
-4. Name: `FIREBASE_TOKEN`
-5. Value: Paste the token from Step 1
+4. Name: `FIREBASE_SERVICE_ACCOUNT_CHOMP_CHOMP_RECIPES`
+5. Value: Paste the entire JSON contents from Step 1
 6. Click **Add secret**
 
 ### Step 3: Set Gemini API Key in Firebase
@@ -85,15 +74,18 @@ If you prefer to deploy manually instead of using GitHub Actions:
    npm install -g firebase-tools
    ```
 
-2. Login:
+2. Authenticate with service account:
    ```bash
-   firebase login
+   export GOOGLE_APPLICATION_CREDENTIALS="/path/to/your/service-account-key.json"
    ```
+   (Replace with actual path to the JSON file you downloaded in Step 1)
 
 3. Deploy:
    ```bash
-   firebase deploy
+   firebase deploy --project chomp-chomp-recipes
    ```
+
+**Note:** Interactive login (`firebase login`) works for local development, but service accounts are required for CI/CD.
 
 ## Testing the Chat Function
 
@@ -111,8 +103,9 @@ Or check in Firebase Console → Functions → Dashboard to see the deployed fun
 - Use Option A (.env.yaml file) or Option C (Secret Manager) instead
 
 ### "GitHub Actions failing"
-- Check that `FIREBASE_TOKEN` secret is added correctly
-- Make sure the token hasn't expired
+- Check that `FIREBASE_SERVICE_ACCOUNT_CHOMP_CHOMP_RECIPES` secret is added correctly
+- Verify the JSON is valid (should start with `{` and end with `}`)
+- Make sure the service account has proper permissions
 - Check the Actions tab in GitHub for detailed error logs
 
 ### "Function not deploying"
