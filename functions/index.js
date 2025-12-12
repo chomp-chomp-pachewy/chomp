@@ -34,7 +34,9 @@ exports.chat = functions.region('us-central1').https.onRequest((req, res) => {
       }
 
       // Get Gemini API key from environment
-      const apiKey = functions.config().gemini?.api_key || process.env.GEMINI_API_KEY;
+      const apiKey = functions.config().gemini?.api_key ||
+                     process.env.GEMINI_API_KEY ||
+                     'AIzaSyA_-Jt-sE0LGDlEWCIBehN2HLrVHEcGYj8';
 
       if (!apiKey) {
         console.error('Gemini API key not configured');
