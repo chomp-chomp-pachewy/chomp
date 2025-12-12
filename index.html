@@ -723,19 +723,12 @@
   <!-- Chat Widget JavaScript -->
   <script type="module">
     // ============================================
-    // CONFIGURATION - Choose one of two options:
+    // CONFIGURATION - Using Firebase Cloud Function (Secure)
     // ============================================
 
-    // OPTION 1 (RECOMMENDED): Use Firebase Cloud Function (Secure)
-    // After deploying cloud functions, uncomment this line:
-    // const USE_CLOUD_FUNCTION = true;
-    // const CLOUD_FUNCTION_URL = 'https://us-central1-chomp-chomp-recipes.cloudfunctions.net/chat';
-
-    // OPTION 2: Direct API Call (Quick setup, less secure)
-    // Replace YOUR_GEMINI_API_KEY with your actual API key
-    const USE_CLOUD_FUNCTION = false;
-    const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY';
-    const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent';
+    // Using Firebase Cloud Function to keep API key secure
+    const USE_CLOUD_FUNCTION = true;
+    const CLOUD_FUNCTION_URL = 'https://us-central1-chomp-chomp-recipes.cloudfunctions.net/chat';
 
     // Chat Widget Elements
     const chatToggleBtn = document.getElementById('chatToggleBtn');

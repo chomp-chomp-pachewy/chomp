@@ -6,6 +6,11 @@
 const functions = require('firebase-functions');
 const cors = require('cors')({ origin: true });
 
+// For local development, load .env file
+if (process.env.NODE_ENV !== 'production') {
+  require('dotenv').config();
+}
+
 /**
  * Cloud Function to handle Gemini API chat requests
  * This keeps the Gemini API key secure on the server side
