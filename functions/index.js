@@ -18,7 +18,7 @@ if (process.env.NODE_ENV !== 'production') {
  * Configure the GEMINI_API_KEY environment variable:
  * firebase functions:config:set gemini.api_key="YOUR_GEMINI_API_KEY"
  */
-exports.chat = functions.https.onRequest((req, res) => {
+exports.chat = functions.region('us-central1').https.onRequest((req, res) => {
   // Enable CORS for all origins (or restrict to your domain)
   cors(req, res, async () => {
     // Only allow POST requests
